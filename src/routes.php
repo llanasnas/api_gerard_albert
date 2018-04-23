@@ -4,12 +4,16 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 
 // Routes
-
-$app->get('/[{name}]', function (Request $request, Response $response, array $args) {
-    // Sample log message
-    $this->logger->info("Slim-Skeleton '/' route");
-
-    // Render index view
-    return $this->renderer->render($response, 'index.phtml', $args);
+$app->get('/',function (Request $request, Response $response, array $args){
+    $args["code"] = "200";
+    $args["msg"] = "LSNote API v0.1";
+    $response= $response->withJson($args,200);
+    return $response;
 });
+// Routes
+$app->get('/',function (Request $request, Response $response, array $args){
+
+    return $response;
+});
+
 
