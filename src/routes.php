@@ -26,7 +26,7 @@ $app->get('/', function (Request $request, Response $response, array $args) {
 // Routes
 $app->get('/getAll', function (Request $request, Response $response, array $args) {
 
-    $getAll = "SELECT * FROM notes";
+    $getAll = "SELECT * FROM notes ORDER BY title";
     $result = $GLOBALS['conn']->query($getAll);
 
     if ($result->num_rows > 0) {
@@ -181,6 +181,108 @@ $app->get('/addTagOne/{id}/{tag}', function (Request $request, Response $respons
 
 });
 
+
+
+$app->get('/deleteTagOne/{id}/{tag}', function (Request $request, Response $response, array $args) {
+
+    $query = "SELECT " . $args["tag"] ." FROM notes where id = " . $args["id"];
+    $result = $GLOBALS['conn']->query($query);
+
+    if ($result->num_rows > 0) {
+        $tagUpdatable = "";
+        while ($row = $result->fetch_assoc()) {
+            if ($row[$args["tag"]] == null) {
+                $args["code"] = "204";
+                $args["msg"] = "Este tag ya se encuentra vacio!";
+            }else{
+                $tagUp = "UPDATE notes SET ". $args["tag"] . " = null WHERE id = " . $args["id"];
+                if ($GLOBALS['conn']->query($tagUp) === TRUE) {
+
+                    $args["code"] = "204";
+                    $args["msg"] = "Tag borrado correctamente";
+
+                }
+            }
+        }
+    } else {
+        $args["code"] = "204";
+        $args["msg"] = "ID not found!";
+    }
+
+
+    $response = $response->withJson($args, 200);
+
+    return $response;
+
+
+});
+
+
+$app->get('/updateNote/{id}[/{optional1}/{optional2}]', function (Request $request, Response $response, array $args) {
+
+
+
+
+
+            $tagUp = "UPDATE notes SET title = '" . $args["optional1"] . "', content = '" . $args["optional2"] . "' WHERE id = " . $args["id"];
+            if ($GLOBALS['conn']->query($tagUp) === TRUE) {
+
+                $args["code"] = "204";
+                $args["msg"] = "Nota actualizada";
+
+            }else {
+                $args["code"] = "204";
+                $args["msg"] = "ID not found!";
+            }
+
+
+
+    $response = $response->withJson($args, 200);
+
+    return $response;
+
+
+});
+
+$app->get('/flipPrivate/{id}', function (Request $request, Response $response, array $args) {
+
+
+    $query = "SELECT private FROM notes where id = " . $args["id"];
+    $result = $GLOBALS['conn']->query($query);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            if ($row["private"] == 0) {
+                $tagUp = "UPDATE notes SET private = 1 WHERE id = " . $args["id"];
+                if ($GLOBALS['conn']->query($tagUp) === TRUE) {
+
+                    $args["code"] = "204";
+                    $args["msg"] = "Privacidad actualizada a 1";
+
+                }
+
+            }else{
+                $tagUp = "UPDATE notes SET private = 0 WHERE id = " . $args["id"];
+                if ($GLOBALS['conn']->query($tagUp) === TRUE) {
+
+                    $args["code"] = "204";
+                    $args["msg"] = "Privacidad actualizada a 0";
+
+                }
+            }
+        }
+    } else {
+        $args["code"] = "204";
+        $args["msg"] = "ID not found!";
+    }
+
+
+    $response = $response->withJson($args, 200);
+
+    return $response;
+
+
+});
 
 ?>
 
